@@ -349,10 +349,8 @@ namespace _2dArray
                         case ConsoleKey.D2:
                             monsterHealthTemp = 0;
                             break;
-                        case ConsoleKey.D3:
-                            playerHealth = 0;
-                            break;
                     }
+
                 }
                 else
                 {
