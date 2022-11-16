@@ -38,9 +38,10 @@ namespace _2dArray
             {"Mountain Goblin","Mad Goat","Giant","vulture" } //Mountain
         };
 
-        // monsterRND stats
-        static int[] monsterHealth = new int[16];
-        static int[] monsterAttack = new int[16];
+        // monster stats
+        static readonly int[] monsterHealth = new int[16];
+        static readonly int[] monsterAttack = new int[16];
+        static readonly int[] monsterSpeed = new int[16];
 
 
         //Map length and width
@@ -53,14 +54,16 @@ namespace _2dArray
         //player Stats
         static int playerAttack = 10;
         static int playerHealth = 50;
+        static int playerHealthTemp = playerHealth;
+        static int playerSpeed = 10;
 
 
-            
+
         static bool exit = false;
 
-        static Random rnd = new Random();
-     
-        static int monsterEncounter = rnd.Next(1,20);
+        static readonly Random rnd = new Random();
+
+        static int monsterEncounter = rnd.Next(1, 20);
         static void Main(string[] args)
         {
             //monsterRND stats initialization
@@ -84,12 +87,12 @@ namespace _2dArray
             //Monster Attack
             monsterAttack[0] = 5; //Forest Goblin
             monsterAttack[1] = 50; //Bear
-            monsterAttack[2] = 50; //Wolf
+            monsterAttack[2] = 25; //Wolf
             monsterAttack[3] = 10; //Mad Deer
             monsterAttack[4] = 5; //Plains Goblin
-            monsterAttack[5] = 20; //Slime
-            monsterAttack[6] = 20; //Bandit
-            monsterAttack[7] = 15; //Mad Horse
+            monsterAttack[5] = 15; //Slime
+            monsterAttack[6] = 10; //Bandit
+            monsterAttack[7] = 20; //Mad Horse
             monsterAttack[8] = 5; //Water Goblin
             monsterAttack[9] = 50; //Shark
             monsterAttack[10] = 20; //Pirate
@@ -99,14 +102,31 @@ namespace _2dArray
             monsterAttack[14] = 50; //Giant
             monsterAttack[15] = 20; //vulture
 
+            monsterSpeed[0] = 10; //Forest Goblin
+            monsterSpeed[1] = 35; //Bear
+            monsterSpeed[2] = 50; //Wolf
+            monsterSpeed[3] = 60; //Mad Deer
+            monsterSpeed[4] = 10; //Plains Goblin
+            monsterSpeed[5] = 10; //Slime
+            monsterSpeed[6] = 10; //Bandit
+            monsterSpeed[7] = 40; //Mad Horse
+            monsterSpeed[8] = 10; //Water Goblin
+            monsterSpeed[9] = 50; //Shark
+            monsterSpeed[10] = 10; //Pirate
+            monsterSpeed[11] = 110; //Mad Fish
+            monsterSpeed[12] = 10; //Mountain Goblin
+            monsterSpeed[13] = 15; //Mad Goat
+            monsterSpeed[14] = 30; //Giant
+            monsterSpeed[15] = 35; //vulture
+
             Console.CursorVisible = false;
             MapDraw();
             PlayerPosition();
-            update();
+            Update();
         }
-        static void update()
+        static void Update()
         {
-            while(exit == false)
+            while (exit == false)
             {
                 //Console.Clear();
                 // MapDraw();
@@ -119,7 +139,7 @@ namespace _2dArray
         static void MapDraw()
         {
             Console.Write("+");
-            for ( int i = 0; i < map.GetLength(1); i++)
+            for (int i = 0; i < map.GetLength(1); i++)
             {
                 Console.Write("-");
             }
@@ -149,26 +169,26 @@ namespace _2dArray
         {
             Console.SetCursorPosition(0, 0);
             Console.Write("+");
-            for (int i = 0; i < (map.GetLength(1)* scale); i++)
+            for (int i = 0; i < (map.GetLength(1) * scale); i++)
             {
                 Console.Write("-");
             }
             Console.Write("+");
             Console.WriteLine();
             for (int vertical = 0; vertical <= (timeTableScaleY - 1); vertical++)
-            { 
-                for (int scaleY = 1; scaleY <= scale; scaleY++ )
+            {
+                for (int scaleY = 1; scaleY <= scale; scaleY++)
                 {
                     Console.Write("|");
                     for (int horizontal = 0; horizontal <= (timeTableScaleX - 1); horizontal++)
                     {
-                        
+
                         for (int scalex = 1; scalex <= scale; scalex++)
                         {
                             MapColour(vertical, horizontal);
                             //Console.ReadKey(true);
                         }
-                        
+
                     }
                     Console.Write("|");
                     Console.WriteLine();
@@ -188,7 +208,7 @@ namespace _2dArray
         {
             char mapIcon = map[v, h];
 
-            switch(mapIcon)
+            switch (mapIcon)
             {
                 case '^':
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -224,8 +244,8 @@ namespace _2dArray
 
 
             playerInput = Console.ReadKey(true);
-            switch(playerInput.Key)
-            {   
+            switch (playerInput.Key)
+            {
                 case ConsoleKey.W:
                     playerVertical -= 1;
                     break;
@@ -244,7 +264,7 @@ namespace _2dArray
                 default:
                     Console.WriteLine(playerInput.Key + " is not a valid input");
                     break;
-                }
+            }
             MapUpdate();
         }
         //prints the player to the screen
@@ -266,7 +286,7 @@ namespace _2dArray
             }
             else
             {
-                monsterEncounter = rnd.Next(1,20);
+                monsterEncounter = rnd.Next(1, 20);
                 MonsterCheck();
             }
         }
@@ -293,11 +313,11 @@ namespace _2dArray
         }
         static void MonsterCheck()
         {
-            char mapIcon = map[(playerVertical - 1),(playerHorizontal - 1)];
+            char mapIcon = map[(playerVertical - 1), (playerHorizontal - 1)];
             int monsterRND = rnd.Next(0, 3);
             string monster;
 
-            switch(mapIcon)
+            switch (mapIcon)
             {
                 case '*':
                     monster = monsterTable[0, monsterRND];
@@ -312,7 +332,7 @@ namespace _2dArray
                     Battle(monster);
                     break;
                 case '^':
-                    monster = monsterTable[3,monsterRND];
+                    monster = monsterTable[3, monsterRND];
                     Battle(monster);
                     break;
 
@@ -325,19 +345,25 @@ namespace _2dArray
         static void Battle(string monster)
         {
             int monsterHealthTemp = MonsterHealth(monster);
+            int monsterAttackTemp = MonsterAttackPower(monster);
+            int monsterSpeedTemp = MonsterSpeed(monster);
             bool escaped = false;
-            Console.WriteLine(monster);
-            Console.WriteLine("");
             int playerAttackRND;
-            Monster();
-            BattleText();
+
             ConsoleKeyInfo playerInput;
 
 
             while (monsterHealthTemp > 0)
             {
-                Console.WriteLine(monsterHealthTemp);
-                if (playerHealth > 0)
+                Console.Clear();
+                Console.WriteLine("Player Health " + playerHealthTemp);
+                Console.WriteLine(monster);
+                Monster();
+                BattleText();
+
+                //Console.WriteLine("Monster Health: " + monsterHealthTemp);
+                //Console.WriteLine("Player Health: " + playerHealthTemp);
+                if (playerHealthTemp > 0)
                 {
                     playerInput = Console.ReadKey(true);
                     switch (playerInput.Key)
@@ -350,10 +376,17 @@ namespace _2dArray
                             monsterHealthTemp = 0;
                             break;
                     }
+                    int monsterAttackRnd = rnd.Next(1, monsterAttackTemp);
+                    MonsterAttack(monsterAttackRnd, monsterSpeedTemp, monster);
+
+                    //Console.WriteLine(monsterAttackTemp + " monster Attack");
+                    //Console.WriteLine(monsterAttackRnd + " monster Attack");
 
                 }
                 else
                 {
+                    Console.WriteLine("You have died... Good Bye.");
+                    Console.ReadKey();
                     System.Environment.Exit(0);
                 }
             }
@@ -428,6 +461,141 @@ namespace _2dArray
                     return tempMonsterHealth;
                 default:
                     return tempMonsterHealth;
+            }
+        }
+        private static int MonsterAttackPower(string monster)
+        {
+            int tempMonsterAttack = 0;
+            switch (monster)
+            {
+                case "Forest Goblin":
+                    tempMonsterAttack = monsterAttack[0];
+                    return tempMonsterAttack;
+                case "Bear":
+                    tempMonsterAttack = monsterAttack[1];
+                    return tempMonsterAttack;
+                case "Wolf":
+                    tempMonsterAttack = monsterAttack[2];
+                    return tempMonsterAttack;
+                case "Mad Deer":
+                    tempMonsterAttack = monsterAttack[3];
+                    return tempMonsterAttack;
+                case "Plains Goblin":
+                    tempMonsterAttack = monsterAttack[4];
+                    return tempMonsterAttack;
+                case "Slime":
+                    tempMonsterAttack = monsterAttack[5];
+                    return tempMonsterAttack;
+                case "Bandit":
+                    tempMonsterAttack = monsterAttack[6];
+                    return tempMonsterAttack;
+                case "Mad Horse":
+                    tempMonsterAttack = monsterAttack[7];
+                    return tempMonsterAttack;
+                case "Water Goblin":
+                    tempMonsterAttack = monsterAttack[8];
+                    return tempMonsterAttack;
+                case "Shark":
+                    tempMonsterAttack = monsterAttack[9];
+                    return tempMonsterAttack;
+                case "Pirate":
+                    tempMonsterAttack = monsterAttack[10];
+                    return tempMonsterAttack;
+                case "Mad Fish":
+                    tempMonsterAttack = monsterAttack[11];
+                    return tempMonsterAttack;
+                case "Mountain Goblin":
+                    tempMonsterAttack = monsterAttack[12];
+                    return tempMonsterAttack;
+                case "Mad Goat":
+                    tempMonsterAttack = monsterAttack[13];
+                    return tempMonsterAttack;
+                case "Giant":
+                    tempMonsterAttack = monsterAttack[14];
+                    return tempMonsterAttack;
+                case "vulture":
+                    tempMonsterAttack = monsterAttack[15];
+                    return tempMonsterAttack;
+                default:
+                    return tempMonsterAttack;
+            }
+        }
+        private static int MonsterSpeed(string monster)
+        {
+            int tempMonsterSpeed = 0;
+            switch (monster)
+            {
+                case "Forest Goblin":
+                    tempMonsterSpeed = monsterSpeed[0];
+                    return tempMonsterSpeed;
+                case "Bear":
+                    tempMonsterSpeed = monsterSpeed[1];
+                    return tempMonsterSpeed;
+                case "Wolf":
+                    tempMonsterSpeed = monsterSpeed[2];
+                    return tempMonsterSpeed;
+                case "Mad Deer":
+                    tempMonsterSpeed = monsterSpeed[3];
+                    return tempMonsterSpeed;
+                case "Plains Goblin":
+                    tempMonsterSpeed = monsterSpeed[4];
+                    return tempMonsterSpeed;
+                case "Slime":
+                    tempMonsterSpeed = monsterSpeed[5];
+                    return tempMonsterSpeed;
+                case "Bandit":
+                    tempMonsterSpeed = monsterSpeed[6];
+                    return tempMonsterSpeed;
+                case "Mad Horse":
+                    tempMonsterSpeed = monsterSpeed[7];
+                    return tempMonsterSpeed;
+                case "Water Goblin":
+                    tempMonsterSpeed = monsterSpeed[8];
+                    return tempMonsterSpeed;
+                case "Shark":
+                    tempMonsterSpeed = monsterSpeed[9];
+                    return tempMonsterSpeed;
+                case "Pirate":
+                    tempMonsterSpeed = monsterSpeed[10];
+                    return tempMonsterSpeed;
+                case "Mad Fish":
+                    tempMonsterSpeed = monsterSpeed[11];
+                    return tempMonsterSpeed;
+                case "Mountain Goblin":
+                    tempMonsterSpeed = monsterSpeed[12];
+                    return tempMonsterSpeed;
+                case "Mad Goat":
+                    tempMonsterSpeed = monsterSpeed[13];
+                    return tempMonsterSpeed;
+                case "Giant":
+                    tempMonsterSpeed = monsterSpeed[14];
+                    return tempMonsterSpeed;
+                case "vulture":
+                    tempMonsterSpeed = monsterSpeed[15];
+                    return tempMonsterSpeed;
+                default:
+                    return tempMonsterSpeed;
+            }
+        }
+        static void MonsterAttack(int tempMonsterAttack, int tempMonsterSpeed, string monster)
+        {
+            int MonsterSpeedRnd = rnd.Next(0, tempMonsterSpeed);
+            int playerSpeedRnd = rnd.Next(1, playerSpeed);
+            
+            if (playerSpeedRnd >= MonsterSpeedRnd)
+            {
+                Console.WriteLine("The " + monster + " missed");
+                Console.ReadKey(true);
+            }
+            else
+            {
+                Console.WriteLine("You take " + tempMonsterAttack + " Damage");
+                playerHealthTemp -= tempMonsterAttack;
+                if (playerHealthTemp < 0)
+                {
+                    playerHealthTemp = 0;
+                }
+                Console.ReadKey(true);
             }
         }
     }
