@@ -42,6 +42,14 @@ namespace _2dArray
         static readonly int[] monsterHealth = new int[16];
         static readonly int[] monsterAttack = new int[16];
         static readonly int[] monsterSpeed = new int[16];
+        static int[,] monsterStats = new int[,]
+        {
+            {30,80,50,40,30,20,50,60,30,80,50,20,30,40,100,50}, // monster health
+            {5,50,25,10,5,15,10,20,5,50,20,5,5,15,50,20}, // Monster Attack
+            {10,35,50,60,10,10,10,40,10,50,10,110,10,15,30,35}, // Monster Speed
+            {10,100,50,25,10,5,15,50,10,100,15,5,10,25,100,50 }, // Monster Xp
+        };
+        
 
 
         //Map length and width
@@ -56,6 +64,8 @@ namespace _2dArray
         static int playerHealth = 50;
         static int playerHealthTemp = playerHealth;
         static int playerSpeed = 10;
+        static int playerCurrentExp = 0;
+        static int expToNextLvl = 100;
 
 
 
@@ -121,6 +131,8 @@ namespace _2dArray
 
             Console.CursorVisible = false;
             MapDraw();
+            Hud();
+            Instructions();
             PlayerPosition();
             Update();
         }
@@ -261,6 +273,10 @@ namespace _2dArray
                 case ConsoleKey.Escape:
                     exit = true;
                     break;
+                case ConsoleKey.R:
+                    Console.WriteLine("You reat to full health");
+                    playerHealthTemp = playerHealth;
+                    break;
                 default:
                     Console.WriteLine(playerInput.Key + " is not a valid input");
                     break;
@@ -281,7 +297,10 @@ namespace _2dArray
             if (monsterEncounter > 0)
             {
                 MapDraw();
+                Hud();
+                Instructions();
                 PlayerPosition();
+
                 monsterEncounter -= 1;
             }
             else
@@ -344,9 +363,11 @@ namespace _2dArray
         }
         static void Battle(string monster)
         {
-            int monsterHealthTemp = MonsterHealth(monster);
-            int monsterAttackTemp = MonsterAttackPower(monster);
-            int monsterSpeedTemp = MonsterSpeed(monster);
+            int monsterID = MonsterStat(monster);
+            int monsterHealthTemp = monsterStats[0, monsterID]; 
+            int monsterAttackTemp = monsterStats[1, monsterID];
+            int monsterSpeedTemp = monsterStats[2, monsterID];
+            int monsterExpTemp = monsterStats[3, monsterID];
             bool escaped = false;
             int playerAttackRND;
 
@@ -356,7 +377,7 @@ namespace _2dArray
             while (monsterHealthTemp > 0)
             {
                 Console.Clear();
-                Console.WriteLine("Player Health " + playerHealthTemp);
+                Hud();
                 Console.WriteLine(monster);
                 Monster();
                 BattleText();
@@ -370,9 +391,11 @@ namespace _2dArray
                     {
                         case ConsoleKey.D1:
                             playerAttackRND = rnd.Next(1, playerAttack);
+                            Console.WriteLine(monster + " Takes " + playerAttackRND + " damage");
                             monsterHealthTemp -= playerAttackRND;
                             break;
                         case ConsoleKey.D2:
+                            escaped = true;
                             monsterHealthTemp = 0;
                             break;
                     }
@@ -385,9 +408,19 @@ namespace _2dArray
                 }
                 else
                 {
-                    Console.WriteLine("You have died... Good Bye.");
+                    Console.WriteLine("You have died...");
                     Console.ReadKey();
                     System.Environment.Exit(0);
+                }
+            }
+            if (escaped == false)
+            {
+                playerCurrentExp += monsterExpTemp;
+                Console.WriteLine("You gained " + monsterExpTemp + " expairiance");
+                Console.ReadKey();
+                if (playerCurrentExp >= expToNextLvl)
+                {
+                    LevelUp();
                 }
             }
             MapUpdate();
@@ -406,58 +439,74 @@ namespace _2dArray
             Console.WriteLine(@" || ");
             Console.WriteLine("");
         }
-        private static int MonsterHealth(string monster)
+        private static int MonsterStat(string monster)
         {
             int tempMonsterHealth = 0;
             switch (monster)
             {
                 case "Forest Goblin":
-                    tempMonsterHealth = monsterHealth[0];
+                    //tempMonsterHealth = monsterHealth[0];
+                    tempMonsterHealth = 0;
                     return tempMonsterHealth;
                 case "Bear":
-                    tempMonsterHealth = monsterHealth[1];
+                    //tempMonsterHealth = monsterHealth[1];
+                    tempMonsterHealth = 1;
                     return tempMonsterHealth;
                 case "Wolf":
-                    tempMonsterHealth = monsterHealth[2];
+                    tempMonsterHealth = 2;
+                    //tempMonsterHealth = monsterHealth[2];
                     return tempMonsterHealth;
                 case "Mad Deer":
-                    tempMonsterHealth = monsterHealth[3];
+                    tempMonsterHealth = 3;
+                    //tempMonsterHealth = monsterHealth[3];
                     return tempMonsterHealth;
                 case "Plains Goblin":
-                    tempMonsterHealth = monsterHealth[4];
+                    tempMonsterHealth = 4;
+                    //tempMonsterHealth = monsterHealth[4];
                     return tempMonsterHealth;
                 case "Slime":
-                    tempMonsterHealth = monsterHealth[5];
+                    tempMonsterHealth = 5;
+                    //tempMonsterHealth = monsterHealth[5];
                     return tempMonsterHealth;
                 case "Bandit":
-                    tempMonsterHealth = monsterHealth[6];
+                    tempMonsterHealth = 6;
+                    //tempMonsterHealth = monsterHealth[6];
                     return tempMonsterHealth;
                 case "Mad Horse":
-                    tempMonsterHealth = monsterHealth[7];
+                    tempMonsterHealth = 7;
+                    //tempMonsterHealth = monsterHealth[7];
                     return tempMonsterHealth;
                 case "Water Goblin":
-                    tempMonsterHealth = monsterHealth[8];
+                    tempMonsterHealth = 8;
+                    //tempMonsterHealth = monsterHealth[8];
                     return tempMonsterHealth;
                 case "Shark":
-                    tempMonsterHealth = monsterHealth[9];
+                    tempMonsterHealth = 9;
+                    //tempMonsterHealth = monsterHealth[9];
                     return tempMonsterHealth;
                 case "Pirate":
-                    tempMonsterHealth = monsterHealth[10];
+                    tempMonsterHealth = 10;
+                    //tempMonsterHealth = monsterHealth[10];
                     return tempMonsterHealth;
                 case "Mad Fish":
-                    tempMonsterHealth = monsterHealth[11];
+                    tempMonsterHealth = 11;
+                    //tempMonsterHealth = monsterHealth[11];
                     return tempMonsterHealth;
                 case "Mountain Goblin":
-                    tempMonsterHealth = monsterHealth[12];
+                    tempMonsterHealth = 12;
+                    //tempMonsterHealth = monsterHealth[12];
                     return tempMonsterHealth;
                 case "Mad Goat":
-                    tempMonsterHealth = monsterHealth[13];
+                    tempMonsterHealth = 13;
+                    //tempMonsterHealth = monsterHealth[13];
                     return tempMonsterHealth;
                 case "Giant":
-                    tempMonsterHealth = monsterHealth[14];
+                    tempMonsterHealth = 14;
+                    //tempMonsterHealth = monsterHealth[14];
                     return tempMonsterHealth;
                 case "vulture":
-                    tempMonsterHealth = monsterHealth[15];
+                    tempMonsterHealth = 15;
+                    //tempMonsterHealth = monsterHealth[15];
                     return tempMonsterHealth;
                 default:
                     return tempMonsterHealth;
@@ -597,6 +646,25 @@ namespace _2dArray
                 }
                 Console.ReadKey(true);
             }
+        }
+        static void LevelUp()
+        {
+            playerHealth = (int)Math.Round( playerHealth * 1.5f);
+            playerHealthTemp = playerHealth;
+            playerSpeed = (int)Math.Round(playerSpeed * 1.5f);
+            playerAttack = (int)Math.Round(playerAttack * 1.5f);
+            playerCurrentExp = 0;
+            expToNextLvl = (int)Math.Round(expToNextLvl * 1.5f);
+
+        }
+        static void Hud()
+        {
+            Console.WriteLine("health: " + playerHealthTemp + @"/" + playerHealth + " Exp: " + playerCurrentExp + @"/" + expToNextLvl);
+        }
+        static void Instructions()
+        {
+            Console.WriteLine("W/A/S/D to move");
+            Console.WriteLine("R to rest");
         }
     }
 }
